@@ -1,7 +1,7 @@
 {
     "name": "lincell",
-    "version": "0.0.2",
-    "description": "lincellæ˜¯ç”¨Node.jså¼€å‘çš„è½»å‹æ–‡ä»¶ç¼–è¾‘å™¨(ä¹Ÿå¯ä»¥ä½œä¸ºç®€å•çš„IDEä½¿ç”¨)",
+    "version": "0.0.3",
+    "description": "lincellÊÇÓÃNode.js¿ª·¢µÄÇáĞÍÎÄ¼ş±à¼­Æ÷(Ò²¿ÉÒÔ×÷Îª¼òµ¥µÄIDEÊ¹ÓÃ)",
     "repository": "https://github.com/sumory/lincell.git",
     "engines": {
         "node": "0.8.*"
