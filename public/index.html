@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LinCell - list all in cell</title>
+    <link href="favicon.ico" rel="icon" type="image/x-icon">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/smoothness/jquery-ui-1.10.1.custom.min.css">
+    <link rel="stylesheet" href="css/jquery.pnotify.default.css">
+    <link rel="stylesheet" href="css/jquery.pnotify.default.icons.css">
+
+</head>
+<body>
+<div id="sidebar">
+    <input type="search" id="search-field" placeholder="Filter Files by Name">
+    <ul>
+        <li class="root" id="project">
+            <img src="img/project.png"><span id="root_path"></span>
+            <div id="files">
+                <ul>
+                    <li><img src="img/ajax-loader.gif">Loading...
+                </ul>
+            </div>
+    </ul>
+    <ul>
+        <li class="root" id="search">
+        <img src="img/search.png">Results
+            <div id="search-results"></div>
+    </ul>
+</div>
+<div id="options">
+    <button id="add-file" title="New File"><img src="img/add.png"></button>
+    <button id="remove-file" title="Remove File"><img src="img/remove.png"></button>
+    <button id="add-folder" title="New Folder"><img src="img/create-folder.png"></button>
+    <button id="gear-menu" class="right" title="More Options"><img src="img/gear.png"></button>
+</div>
+
+<div id="content"></div>
+
+<ul id="gear-menu-popup" class="popup-menu">
+    <li><span id="project-refresh">Refresh</span></li>
+    <li class="checkbox"><input type="checkbox" id="show-hidden"><label for="show-hidden">Show Hidden Files</label></li>
+</ul>
+
+<script src="js/external/jquery-1.9.1.min.js"></script>
+<script src="socket.io/socket.io.js"></script>
+<script src="js/external/modernizr-2.0.6.js"></script>
+<script src="js/external/transformjs.1.0.beta.2.js"></script>
+<script src="js/external/jquery.easydate-0.2.4.js"></script>
+<script src="js/external/jquery.cookie.js"></script>
+<script src="js/external/jquery-ui-1.10.1.custom.min.js"></script>
+<script src="js/external/jquery.pnotify.min.js"></script>
+<script>
+    $.pnotify.defaults.styling = "jqueryui";
+    $.pnotify.defaults.history = false;
+</script>
+
+<script src="js/ace/ace.js"></script>
+<script src="js/pool.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>
