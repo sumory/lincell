@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var program = require('commander');
 var server = require('./lib/server.js');
 var project = require('./lib/project.js');
