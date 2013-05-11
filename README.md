@@ -14,6 +14,13 @@ LinCell是用 **Node.js** 开发的轻型文件编辑器(也可以作为简单�
 
 ![lincell](https://raw.github.com/sumory/lincell/master/examples/lincell.png)
 
+
+## 安装
+
+```bash
+$ npm install lincell
+```
+
 ## 使用
 
     Usage: lincell [options]
