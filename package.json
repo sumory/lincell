@@ -1,6 +1,6 @@
 {
     "name": "lincell",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "lincell是用Node.js开发的轻型文件编辑器(也可以作为简单的IDE使用)",
     "repository": "https://github.com/sumory/lincell.git",
     "engines": {
