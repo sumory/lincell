@@ -27,7 +27,7 @@ program.on('--help', function(){
 program.parse(process.argv);
 
 try{
-    var abs_path = path.resolve(process.cwd, program.dir) || process.cwd;
+    var abs_path = path.resolve(process.cwd(), program.dir) || process.cwd();
     var port = program.port || 8222;
     console.log('LinCell is running under Path[%s] on Port[%d]', abs_path, port);
 
