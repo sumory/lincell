@@ -8,8 +8,7 @@ var fs = require('fs');
 var path = require('path');
 var config = require('./config.js');
 
-program
-    .version(config.version)
+program.version(config.version)
     .option('-p, --port <number>', 'use a custom http port(default port is 8222)')
     .option('-d, --dir <string>', 'use a custom path to show(default path is current path)');
 
@@ -45,5 +44,3 @@ catch(e){
     console.log(e);
     process.exit(-1);
 }
-
-
