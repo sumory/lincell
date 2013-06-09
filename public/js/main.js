@@ -22,31 +22,25 @@ var ServerConnection = window.ServerConnection = function () {
     });
 
     socket.on('list', function (data) {
-        ui.updateFileListing(data.children);
+        updateFileListing(data.children);
     });
 
     socket.on('rename-file-success', function (data) {
-        ui.selectFile({
+        selectFile({
             type:'file',
             path:data.path
         });
     });
 
     socket.on('rename-directory-success', function (data) {
-        ui.selectFile({
+        selectFile({
             type:'directory',
             path:data.path
         });
     });
 
     socket.on('rename-error', function (data) {
-        $.pnotify({
-            title:'错误提示!',
-            text:'重命名[' + data.path + ']发生错误:' + data.error,
-            type:'error',
-            hide:false,
-            shadow:false
-        });
+        alert('重命名[' + data.path + ']发生错误:' + data.error);
         console.dir(data);//path: oldpath, error:desc
     });
 
@@ -120,264 +114,124 @@ var ServerConnection = window.ServerConnection = function () {
     };
 };
 
-var UI = window.UI = function () {
-    var _this = this;
 
-    var currentFile
-    var searchResultHtmlElementByPath
-    var fileHtmlElementByPath
-    var stateByPath = {}
-    var fileEntries = []
+var cwd = "";
+var connection = new ServerConnection();
 
-    var ignore = ['.git', '.linc', '.DS_Store']
-    var limitRecursion = ['node_modules']
+var openFilesTable = [];//所有打开的tab
+var aceEditors = {};//所有aceEditors
 
-    var addHTMLElementForFileEntry = function (entry, parentElement, fileEntriesArray, htmlElementByPathTable, ownContext, doLimitRecursion) {
+var currentFile = {};
+var searchResultHtmlElementByPath;
 
-        if (ignore.indexOf(entry.name) != -1) {
-            return;
-        }
+var stateByPath = {};
+var fileEntries = [];
 
-        var thisElement = document.createElement("li");
-        htmlElementByPathTable[entry.path] = thisElement
+var ignore = ['.git', '.DS_Store'];
 
-        if (fileEntriesArray && !doLimitRecursion) {
-            fileEntriesArray.push(entry)
-        }
-
-        if (entry.type == "directory") {
-            thisElement.className = 'folder'
-            if (stateByPath[entry.path] == 'open') {
-                thisElement.className += ' open'
-            }
-            thisElement.innerHTML = '<img src="img/folder.png">' + entry.name + (ownContext ? (' <i>(' + entry.path + ')</i>') : '')
-            $(thisElement).click(function (e) {
-                if (!e.offsetX) e.offsetX = e.clientX - $(e.target).position().left;
-                if (!e.offsetY) e.offsetY = e.clientY - $(e.target).position().top;
-                if (e.target == thisElement && e.offsetY < 24) {
-                    if (e.offsetX < 24) {
-                        $(this).toggleClass('open');
-                        stateByPath[entry.path] = $(this).hasClass('open') ? 'open' : '';
-                        e.stopPropagation()
-                    }
-                    else {
-                        _this.selectFile(entry, htmlElementByPathTable)
-                        e.stopPropagation()
-                    }
-                }
-            })
-            var ul = document.createElement("ul")
-            thisElement.appendChild(ul)
-            for (var childEntry in entry.children) {
-                addHTMLElementForFileEntry(entry.children[childEntry], ul, fileEntriesArray, ownContext ? {} : htmlElementByPathTable, false, doLimitRecursion || limitRecursion.indexOf(entry.name) != -1)
-            }
-        }
-        else {
-            thisElement.innerHTML = '<img src="img/file.png">' + entry.name + (ownContext ? (' <i>(' + entry.path + ')</i>') : '')
-            $(thisElement).click(function (e) {
-                _this.selectFile(entry, htmlElementByPathTable)
-            })
-        }
-        if (entry.name.charAt(0) == '.') {
-            thisElement.className += ' hidden'
-        }
-        parentElement.appendChild(thisElement)
+var addHTMLElementForFileEntry = function (entry, parentElement, fileEntriesArray, htmlElementByPathTable, ownContext) {
+    if (ignore.indexOf(entry.name) != -1) {
+        return;
     }
 
-    $('#show-hidden').click(function () {
-        $('#sidebar').toggleClass('show-hidden')
-    })
+    var thisElement = document.createElement("li");
+    htmlElementByPathTable[entry.path] = thisElement;
 
-    var doSearch = function () {
-        if (this.value != '') {
-            for (var i = 0; i < fileEntries.length; i++) {
-                if (fileEntries[i].name.match(this.value)) {
-                    $(searchResultHtmlElementByPath[fileEntries[i].path]).slideDown()
-                }
-                else {
-                    $(searchResultHtmlElementByPath[fileEntries[i].path]).slideUp()
-                }
-            }
-            $('#project').slideUp();
-            $('#search').slideDown();
-        }
-        else {
-            $('#project').slideDown();
-            $('#search').slideUp();
-        }
-    }
-    $('#search-field').keyup(doSearch).click(doSearch)
-
-    $('#project').click(function (e) {
-        if (e.target == $('#project')[0]) {
-            _this.selectFile({
-                type:'project',
-                path:'/'
-            }, null, $('#project')[0])
-        }
-    })
-
-    $('#add-file').click(function (e) {
-        var filename = prompt('Type in a filename for the new file:', 'untitled.js')
-        if (filename) {
-            var path;
-            if (!currentFile) {
-                path = '/'
-            }
-            else {
-                switch (currentFile.type) {
-                    case 'directory':
-                        path = currentFile.path + '/'
-                        break;
-                    case 'file':
-                        path = currentFile.path.replace(/\/[^\/]+$/, '/')
-                        break;
-                    default:
-                        path = '/'
-                        break;
-                }
-            }
-
-            connection.addFile(path + filename);
-        }
-    })
-
-    $('#add-folder').click(function (e) {
-        var filename = prompt('Type in a filename for the new folder', 'folder')
-        if (filename) {
-            var path;
-            if (!currentFile) {
-                path = '/'
-            }
-            else {
-                switch (currentFile.type) {
-                    case 'directory':
-                        path = currentFile.path + '/'
-                        break;
-                    case 'file':
-                        path = currentFile.path.replace(/\/[^\/]+$/, '/')
-                        break;
-                    default:
-                        path = '/'
-                        break;
-                }
-            }
-            connection.addFolder(path + filename)
-        }
-    })
-
-    $('#remove-file').click(function (e) {
-        if (currentFile) {
-            var confirmed
-            if (currentFile.type == 'file') {
-                confirmed = confirm('Are you sure to delete this file?')
-            }
-            else if (currentFile.type == 'directory') {
-                confirmed = confirm('This will remove the directory and all its contents. Are you sure?')
-            }
-            else {
-                confirmed = false
-            }
-            if (confirmed) {
-                connection.removeFile(currentFile.path)
-            }
-        }
-    })
-
-    $('#project-refresh').click(function (e) {
-        connection.list()
-    })
-
-
-    var shouldDismissGearMenuOnMouseUp = false;
-    var hasJustDisplayedGearMenu = false;
-    $('#gear-menu').mousedown(function (e) {
-        shouldDismissGearMenuOnMouseUp = false;
-        hasJustDisplayedGearMenu = true;
-        $('#gear-menu-popup').show()
-        setTimeout(function () {
-            shouldDismissGearMenuOnMouseUp = true;
-        }, 500)
-        setTimeout(function () {
-            hasJustDisplayedGearMenu = false;
-        }, 0)
-    })
-
-    $('#gear-menu').mouseup(function () {
-        if (shouldDismissGearMenuOnMouseUp) {
-            $('#gear-menu-popup').fadeOut(200)
-        }
-    })
-
-    $('#gear-menu-popup').mousedown(function (e) {
-        e.stopPropagation();
-    })
-
-    $('#gear-menu-popup').mouseup(function (e) {
-        $('#gear-menu-popup').fadeOut(200);
-    })
-
-    $(document.body).mousedown(function () {
-        if (!hasJustDisplayedGearMenu) {
-            $('#gear-menu-popup').fadeOut(200);
-        }
-    })
-
-    $(window).bind('blur resize', function () {
-        $('#gear-menu-popup').fadeOut(200);
-    })
-
-    this.updateFileListing = function (files) {
-        searchResultHtmlElementByPath = {}
-        fileHtmlElementByPath = {}
-        fileEntries = []
-        var ul = document.createElement("ul")
-        for (var file in files) {
-            addHTMLElementForFileEntry(files[file], ul, fileEntries, fileHtmlElementByPath)
-        }
-        document.getElementById('files').innerHTML = '';
-        document.getElementById('files').appendChild(ul);
-
-        ul = document.createElement("ul")
-        for (var i = 0; i < fileEntries.length; i++) {
-            addHTMLElementForFileEntry(fileEntries[i], ul, null, searchResultHtmlElementByPath, true)
-        }
-        document.getElementById('search-results').innerHTML = '';
-        document.getElementById('search-results').appendChild(ul);
+    if (fileEntriesArray) {
+        fileEntriesArray.push(entry);
     }
 
-
-    var setCurrentEditor = function (editor) {
-        var children = $('#content').children();
-        children.css({ visibility:'hidden', zIndex:-1 });
-        if ($.inArray(editor, children) >= 0) {
-            $(editor).css({ visibility:'visible', zIndex:1 });
+    if (entry.type == "directory") {
+        thisElement.className = 'folder';
+        if (stateByPath[entry.path] == 'open') {
+            thisElement.className += ' open';
         }
-        else {
-            $('#content').append(editor);
+        thisElement.innerHTML = '<img src="img/folder.png">' + entry.name + (ownContext ? (' <i>(' + entry.path + ')</i>') : '')
+        $(thisElement).click(function (e) {
+            if (!e.offsetX) e.offsetX = e.clientX - $(e.target).position().left;
+            if (!e.offsetY) e.offsetY = e.clientY - $(e.target).position().top;
+            if (e.target == thisElement && e.offsetY < 24) {
+                $(this).toggleClass('open');
+                stateByPath[entry.path] = $(this).hasClass('open') ? 'open' : '';
+                e.stopPropagation();
+            }
+        })
+        var ul = document.createElement("ul");
+        thisElement.appendChild(ul);
+        for (var childEntry in entry.children) {
+            addHTMLElementForFileEntry(entry.children[childEntry], ul, fileEntriesArray, ownContext ? {} : htmlElementByPathTable, false);
         }
-        editor.focus();
+    }
+    else {
+        thisElement.className = 'file';
+        thisElement.innerHTML = '<img src="img/file.png">' + entry.name + (ownContext ? (' <i>(' + entry.path + ')</i>') : '');
+        $(thisElement).click(function (e) {
+            selectFile(entry, htmlElementByPathTable);
+        })
     }
 
-
-    var editorPool = new EditorPool();
-    this.selectFile = function (entry, htmlElementByPathTable, htmlElement) {
-        if (!htmlElementByPathTable) {
-            htmlElementByPathTable = fileHtmlElementByPath;
-        }
-
-        $('.selected').removeClass('selected');
-        currentFile = entry;
-        $(htmlElement || htmlElementByPathTable[currentFile.path]).addClass('selected');
-
-        var editor = editorPool.editorForEntry(entry, function (discarted) {
-            $(discarted).remove();
-        });
-
-        setCurrentEditor(editor);
+    if (entry.name.charAt(0) == '.') {
+        thisElement.className += ' hidden';
     }
-};
+    parentElement.appendChild(thisElement);
+}
 
+var updateFileListing = function (files) {
+    searchResultHtmlElementByPath = {};
+    fileHtmlElementByPath = {};
+    fileEntries = [];
+    var ul = document.createElement("ul");
+    for (var file in files) {
+        addHTMLElementForFileEntry(files[file], ul, fileEntries, fileHtmlElementByPath);
+    }
+    document.getElementById('files').innerHTML = '';
+    document.getElementById('files').appendChild(ul);
+
+    ul = document.createElement("ul");
+    for (var i = 0; i < fileEntries.length; i++) {
+        addHTMLElementForFileEntry(fileEntries[i], ul, null, searchResultHtmlElementByPath, true);
+    }
+    document.getElementById('search-results').innerHTML = '';
+    document.getElementById('search-results').appendChild(ul);
+}
+
+var selectFile = function (entry, htmlElementByPathTable) {
+    $('.selected').removeClass('selected');
+    $(htmlElementByPathTable[entry.path]).addClass('selected');
+
+    var index = new Date().getTime();
+
+    if (entry.path.match(/\.(jpe?g|png|ico|gif|bmp)$/)) {//如果是图片则显示图片，点击后跳转到图片
+        if (openFilesTable[entry.path]) {//已存在在打开文件列表中，只要让它显示即可
+            showTab(openFilesTable[entry.path].index);
+        }
+        else {//不在打开文件列表中，须创建，然后让它显示
+            openFilesTable[entry.path] = {
+                name:entry.name,
+                path:entry.path,
+                index:index,
+                type:'img'
+            };
+            $('#name-tabs').append('<li name-tab-index="' + index + '"><a class="tab" href="#">' + entry.name + '</a><a class="icon close" href="#"></a></li>');
+            newImgEditor(entry, index);
+        }
+    }
+    else {//是文件，创建AceEditor
+        if (openFilesTable[entry.path]) {//已存在在打开文件列表中，只要让它显示即可
+            showTab(openFilesTable[entry.path].index);
+        }
+        else {//不在打开文件列表中，须创建，然后让它显示
+            openFilesTable[entry.path] = {
+                name:entry.name,
+                path:entry.path,
+                index:index,
+                type:'file'
+            };
+            $('#name-tabs').append('<li name-tab-index="' + index + '"><a class="tab" href="#">' + entry.name + '</a><a class="icon close" href="#"></a></li>');
+            newFileEditor(entry, index);
+        }
+    }
+}
 
 var selectModeFromPath = function (path) {
     switch (true) {
@@ -424,148 +278,242 @@ var selectModeFromPath = function (path) {
     }
 };
 
-var createAceEditor = function (editorId, contents, path, options) {
-    var editor = ace.edit(editorId);
-    editor.setTheme("ace/theme/clouds");
-    var mode = selectModeFromPath(path);
-    //console.log('mode is ', mode);
-    editor.focus();
-    editor.setValue(contents);
-    editor.getSession().setMode("ace/mode/" + mode);
-    editor.setFontSize('14px');
-    editor.clearSelection();
-    editor.getSession().setTabSize(4);
-    editor.renderer.setHScrollBarAlwaysVisible(false);
-    editor.on('change', options.onChange);
-    return  editor;
+var newImgEditor = function (entry, index) {
+    var editor = $('<div class="code-editor"></div>');
+    var imagePath = document.location.protocol + "//" + document.location.hostname + ':' + ((parseInt(document.location.port) || 80) + 1) + entry.path;
+    var image = $('<img/>');
+    image.attr('src', imagePath);
+    image.attr('class', 'view');
+    var a = $('<a href="' + imagePath + '" target="_blank"></a>');
+    a.append(image);
+    editor.append(a);
+    $('#code-tabs').append('<div code-tab-index="' + index + '" class="area stylesheet-style-mss">' + editor.html() + '</div>');
+    showTab(index);
+}
+
+var newFileEditor = function (entry, index) {
+    var editor = $('<div class="code-editor"></div>');
+    connection.loadFile(entry.path, function (err, file) {
+        if (err) {
+            var errorBar = document.createElement('div');
+            errorBar.className = 'error'
+            errorBar.innerHTML = '<b>Unable to open file:</b> ' + err;
+            editor.append(errorBar);
+            $(errorBar).hide();
+            $(errorBar).fadeIn(250);
+        }
+        else {
+            var codeArea = $('<div class="ace_focus"></div>');
+            codeArea.attr("id", 'ace-editor-' + index);
+            codeArea.attr('style', "position: absolute;top: 0px;margin: 0;bottom: 0;left: 0;right: 0;border-top: none;");
+            editor.append(codeArea);
+
+            $('#code-tabs').append('<div code-tab-index="' + index + '" class="area">' + editor.html() + '</div>');
+
+            var mode = selectModeFromPath(entry.path);//console.log('mode is ', mode);
+            var aceEditor = ace.edit(codeArea.attr('id'));
+            aceEditors[index] = {
+                editor: aceEditor,
+                changed: false
+            };
+            aceEditor.setTheme("ace/theme/clouds");
+            aceEditor.focus();
+            aceEditor.setValue(file);
+            aceEditor.getSession().setMode("ace/mode/" + mode);
+            aceEditor.setFontSize('14px');
+            aceEditor.clearSelection();
+            aceEditor.getSession().setTabSize(4);
+            aceEditor.on('change', function(){
+                aceEditors[index].changed = true;
+                $("#name-tabs li[name-tab-index="+index+"] .tab").text("*"+entry.name);
+            });
+            aceEditor.setShowPrintMargin(false);
+
+            showTab(index);
+        }
+    });
 };
 
-var createActionsBar = function (path) {
-    var actionsBar = document.createElement('div');
-    actionsBar.className = 'actions';
-    actionsBar.innerHTML = '<b>' + cwd + path + '</b> ';
 
-    actionsBar.renameButton = document.createElement('button');
-    actionsBar.renameButton.innerHTML = 'Rename';
-    actionsBar.appendChild(actionsBar.renameButton);
-    return actionsBar;
-};
+//~===================================tab===================================
 
-var CodeEditor = window.CodeEditor = function (entry) {
-    var actionsBar = createActionsBar(entry.path);
-    var editor = document.createElement('div');
+$(document).on("click", '#name-tabs li .tab', function () {
+    var index = $(this).parent('li').attr('name-tab-index');
+    showTab(index);
+});
 
-    $(actionsBar.renameButton).click(function (e) {
-        var newName = prompt('New filename:', entry.name);
-        if (newName) {
-            var oldpath = entry.path;
-            var newpath = (oldpath.indexOf('\\') != -1) ? oldpath.substring(0, oldpath.lastIndexOf('\\')) + '\\' + newName : oldpath.substring(0, oldpath.lastIndexOf('/')) + '/' + newName;
-            connection.renameFile(oldpath, newpath);
+$(document).on("click", '#name-tabs li .close', function () {
+    var index = $(this).parent('li').attr('name-tab-index');
+    if(aceEditors[index] && aceEditors[index].changed){//是可编辑内容，如非图片，且内容已经改变
+        art.dialog({
+            content: "内容已被修改，请选择以下操作",
+            button: [
+                {
+                    value: '保存并关闭',
+                    callback: function () {
+                        saveFile(index, function(){closeTab(index)});
+                    },
+                    focus: true
+                },
+                {
+                    value: '直接关闭不保存',
+                    callback: function () {
+                        closeTab(index);
+                    }
+                },
+                {
+                    value: '不关闭'
+                }
+            ]
+        });
+    }
+    else{
+        closeTab(index);
+    }
+});
+
+function closeTab(index){
+    var _this = $("#name-tabs li[name-tab-index="+index+"] .close");
+    var isThisOpen = _this.prev('a').hasClass('active');//如果当前这个tab是open的
+    var prev = _this.parent('li').prev('li').attr('name-tab-index');
+    var next = _this.parent('li').next('li').attr('name-tab-index');
+    var show_index = prev ? prev : (next ? next : undefined);
+
+    $('#name-tabs>li[name-tab-index=' + index + ']').remove();
+    $('#code-tabs>div[code-tab-index=' + index + ']').remove();
+
+    for (var i in openFilesTable) {//从打开的tab列表中删除该项
+        if (openFilesTable[i].index == index) {
+            delete openFilesTable[i];
+            break;
+        }
+    }
+    delete aceEditors[index];
+
+    if (show_index && isThisOpen) {
+        showTab(show_index);
+}
+
+    //控制是否显示方向键
+    if(500<=$("#name-tabs").width()){
+        $(".left_move").show();
+        $(".right_move").show();
+    }
+    else{
+        $(".left_move").hide();
+        $(".right_move").hide();
+    }
+}
+
+function showTab(index) {
+    $('#name-tabs>li').each(function () {
+        if ($(this).attr('name-tab-index') == index) {
+            $(this).children('.tab').addClass('active');
+        }
+        else {
+            $(this).children('.tab').removeClass('active');
         }
     });
 
-    editor.appendChild(actionsBar);
-    editor.className = 'code-editor';
-
-    if (entry.path.match(/\.(jpe?g|png|ico|gif|bmp)$/)) {//如果是图片则显示图片，点击后跳转到图片
-        var imagePath = document.location.protocol + "//" + document.location.hostname + ':' + ((parseInt(document.location.port) || 80) + 1) + entry.path;
-        var image = document.createElement('img');
-        image.src = imagePath;
-        image.className = 'view';
-        var a = document.createElement('a');
-        a.href = imagePath;
-        a.target = "_blank";
-        a.appendChild(image);
-        editor.appendChild(a);
-    }
-    else {
-        connection.loadFile(entry.path, function (err, file) {
-            if (err) {
-                var errorBar = document.createElement('div');
-                errorBar.className = 'error'
-                errorBar.innerHTML = '<b>Unable to open file:</b> ' + err;
-                editor.appendChild(errorBar);
-                $(errorBar).hide();
-                $(errorBar).fadeIn(250);
-            }
-            else {
-                var aceEditor = document.createElement('div');
-                aceEditor.id = 'ace-editor-' + new Date().getTime();
-                aceEditor.className = 'ace_focus';
-                aceEditor.setAttribute('style', "position: absolute;top: 40px;margin: 0;bottom: 0;left: 0;right: 0;border-top: solid 1px #ddd;");
-                editor.appendChild(aceEditor);
-
-                var editors = editors || {};
-
-                editors[aceEditor.id] = createAceEditor(aceEditor.id, file, entry.path, {
-                    onChange:function () {
-                        console.log('content is changed..');
-                        content = editors[aceEditor.id].getValue();
-                        changed = true;
-                    }
-                });
-
-                var content = file;
-                var changed = false;
-                var saving = false;
-
-                setInterval(function () {
-                    if (changed && !saving) {
-                        console.log('to save file...');
-                        var done = false;
-                        saving = true;
-                        var selected = $('.selected');
-                        selected.addClass('syncing');
-                        connection.saveFile(entry.path, content, function (err) {
-                            console.log('save ok...');
-                            if (!err) {
-                                changed = false;
-                                done = true;
-                                selected.removeClass('syncing');
-                            }
-                            saving = false;
-                        })
-                        setTimeout(function () {
-                            if (!done) {
-                                saving = false;
-                            }
-                        }, 3000);
-                    }
-                }, 5000);
-            }
-        })
-    }
-
-    return editor;
-};
-
-var DirectoryEditor = window.DirectoryEditor = function (entry) {
-    var editor = document.createElement('div');
-    editor.className = 'directory-editor';
-    var actionsBar = document.createElement('div');
-    actionsBar.className = 'actions';
-    actionsBar.innerHTML = '<b>' + cwd + entry.path + '</b> ';
-    var renameButton = document.createElement('button');
-    renameButton.innerHTML = 'Rename';
-    $(renameButton).click(function (e) {
-        var newName = prompt('New folder name:', entry.name);
-        console.log('new folder name is: ', newName);
-        if (newName) {
-            var oldpath = entry.path;
-            var newpath = (oldpath.indexOf('\\') != -1) ? oldpath.substring(0, oldpath.lastIndexOf('\\')) + '\\' + newName : oldpath.substring(0, oldpath.lastIndexOf('/')) + '/' + newName;
-            connection.renameDirectory(oldpath, newpath);
+    $('#code-tabs>div').each(function () {
+        if ($(this).attr('code-tab-index') == index) {
+            $(this).addClass('active');
         }
-    })
-    actionsBar.appendChild(renameButton);
-    editor.appendChild(actionsBar);
-    return editor;
-};
+        else {
+            $(this).removeClass('active');
+        }
+    });
 
 
-var ui, connection;
-var cwd = "";
-$(function () {
-    connection = new ServerConnection();
-    ui = new UI();
-});
+    //scroll
+    var a = $("#name-tabs li[name-tab-index=" + index + "]");
+    var hm = $(".tabs-box");
+    var al = a.position().left;
+    var pl = hm.position().left;
+    if (al < pl || al + a.width() > pl + hm.width()) {
+        hm.scrollLeft(hm.scrollLeft() + al - pl);
+    }
 
+    //控制是否显示方向键
+    if(500<=$("#name-tabs").width()){
+        $(".left_move").show();
+        $(".right_move").show();
+    }
+    else{
+        $(".left_move").hide();
+        $(".right_move").hide();
+    }
+
+    //重置目前打开的file基本信息
+    for (var i in openFilesTable) {//从打开的tab列表中删除该项
+        if (openFilesTable[i].index == index) {//即当前打开的tab
+            currentFile =  openFilesTable[i];
+            break;
+        }
+    }
+}
+
+function hscroll() {
+    var s = 20 * ($(this).hasClass('left_move') ? -1 : 1);
+    $(document).mouseup(function () {
+        var t = self.timer;
+        if (t) {
+            window.clearInterval(t);
+        }
+    });
+    self.timer = window.setInterval(function () {
+        var l = $('.tabs-box').scrollLeft();
+        $('.tabs-box').scrollLeft(l + s);
+    }, 20);
+    return self.timer;
+}
+
+$('.left_move').mousedown(hscroll);
+$('.right_move').mousedown(hscroll);
+
+//~====================================操作==================================
+
+var k = new Kibo();
+k.down(['ctrl s'], saveHandler);
+
+function saveHandler(e) {
+    e.preventDefault();
+    if(currentFile && currentFile.type === 'file'){//当前有打开‘文件类型’的文件
+        var index = currentFile.index;
+        connection.saveFile(currentFile.path, aceEditors[index].editor.getValue(), function(err){
+            var tabName =  $("#name-tabs li[name-tab-index="+index+"] .tab").text() || '';
+            if(err){
+                alert('保存文件['+tabName.substring(1)+']出错');
+            }
+            else{
+                aceEditors[index].changed = false;
+                $("#name-tabs li[name-tab-index="+index+"] .tab").text(tabName.substring(1));
+            }
+        });
+    }
+}
+
+function saveFile(index, callback) {
+    var thisFile = undefined;
+    for (var i in openFilesTable) {//从打开的tab列表中选
+        if (openFilesTable[i].index == index) {
+            thisFile = openFilesTable[i];
+            break;
+        }
+    }
+
+    if(thisFile && thisFile.type === 'file'){//当前有打开‘文件类型’的文件
+        connection.saveFile(thisFile.path, aceEditors[index].editor.getValue(), function(err){
+            var tabName =  $("#name-tabs li[name-tab-index="+index+"] .tab").text() || '';
+            if(err){
+                alert('保存文件['+tabName.substring(1)+']出错');
+            }
+            else{
+                aceEditors[index].changed = false;
+                $("#name-tabs li[name-tab-index="+index+"] .tab").text(tabName.substring(1));
+
+                callback && callback();
+            }
+        });
+    }
+}

@@ -1,0 +1,63 @@
+.simple-contextmenu {
+    -webkit-user-select: none;
+    background: url(menu_bg.gif) repeat-y;
+    display: none;
+    font-size: 11px;
+    position: absolute;
+    left: 100px;
+    top: 100px;
+    min-width: 100px;
+    width: 100px;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+    border: 2px solid #ddd;
+    border-radius: 3px;
+}
+
+.simple-contextmenu ul {
+    padding: 0px;
+    margin: 0px;
+    list-style: none;
+}
+
+.simple-contextmenu li {
+    margin: 0px;
+    padding: 1px;
+    background: url(item_bg.gif) repeat-y;
+    background-repeat: no-repeat;
+}
+
+.simple-contextmenu li a {
+    position: relative;
+    display: block;
+    padding: 1px 1px 1px 28px;
+    color: ButtonText;
+    text-decoration: none;
+    margin: 1px;
+}
+
+.simple-contextmenu li a img {
+    position: absolute;
+    border: 0px;
+    left: 3px;
+    margin-top: 0px;
+    width: 14px;
+    height: 14px;
+}
+
+.simple-contextmenu li a:hover {
+    /*border: 1px solid #fffbff;*/
+    border: 1px solid #09F;
+    outline: 1px solid #b5d3ff;
+    margin: 0;
+    cursor: default;
+}
+
+.simple-contextmenu .m-split {
+    height: 2px;
+    background: url(splitLine_bg.gif) center repeat-x;
+    margin: 0 2px;
+}
+

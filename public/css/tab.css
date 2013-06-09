@@ -1,0 +1,229 @@
+#page {
+    left: 0px;
+    padding: 20px;
+}
+
+.overlay > .mask,
+.loading > .mask,
+.fill-e {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+    display: block;
+}
+
+.header {
+    padding: 10px 10px 10px 15px;
+    height: 20px;
+}
+
+/**
+ * Tabs
+ */
+.tabs-box {
+    float: left;
+    position: relative;
+    overflow: hidden;
+    height: 30px;
+    padding-left: 10px;
+    padding-right: 10px;
+    white-space: nowrap;
+    display: inline-block;
+
+    max-width: 500px;
+    min-width: 20px;
+    font-size: 0;
+}
+
+.tabs {
+    display: inline-block;
+    padding: 0;
+}
+
+.tabs li {
+    font-size: 16px;
+    position: relative;
+    white-space: nowrap;
+    display: inline-block;
+    height: 30px;
+}
+
+.tabs li a.tab {
+    position: relative;
+    top: 5px;
+    border: 1px solid #ccc;
+    border-bottom: 0px;
+    border-radius: 3px 3px 0px 0px;
+    box-shadow: inset rgba(255, 255, 255, 0.4) 0px 0px 0px 1px, inset rgba(0, 0, 0, 0.1) 0px -10px 20px -5px, rgba(0, 0, 0, 0.1) 0px 1px 2px;
+
+    padding: 4px 29px 7px 9px;
+    margin: 0px 2px 0px 0px;
+    background: #eee;
+    color: #888;
+}
+
+.tabs li a.tab:hover {
+    background-color: #eee;
+}
+
+.tabs li a.tab.active {
+    background: #fff;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px;
+    color: #222;
+    z-index: 1;
+}
+
+.tabs li a.tab.error {
+    background: #fe8;
+}
+
+a.add {
+    float: left;
+    margin: 5px 3px 0px;
+}
+
+a.move {
+    float: left;
+    margin: 5px 3px 0px;
+}
+
+.tabs li a.icon {
+    opacity: 0.5;
+    position: absolute;
+    right: 5px;
+    top: 4px;
+    z-index: 1;
+}
+
+.tabs li a.icon:hover {
+    opacity: 1;
+}
+
+.clearfix {
+    display: block;
+}
+
+ol, ul, .item-list ul, .item-list ul li {
+    list-style: none;
+}
+
+.clearfix:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+
+a {
+    color: #222;
+    text-decoration: none;
+}
+
+.icon.close {
+    background-position: -80px -180px;
+}
+
+.icon {
+    display: block;
+    padding: 0px;
+    width: 20px;
+    height: 20px;
+    text-indent: -9999px;
+    background: transparent url(../img/sprite.png) 20px 20px no-repeat;
+}
+
+
+
+.reverse.plus {
+    background-position: -180px -200px;
+}
+
+.button .icon, .button:hover .icon {
+    float: left;
+    display: block;
+    margin: -1px -5px;
+    background-color: transparent;
+}
+
+.editor .code {
+    overflow: hidden;
+    top: 69px;
+    bottom: 0px;
+    background: #fff;
+    border-top: 1px solid #ccc;
+    box-shadow: rgba(0, 0, 0, .1) 0px 0px 3px;
+}
+
+.overlay > .mask, .loading > .mask, .fill, .fill-s, .fill-n, .fill-w, .fill-e {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+    display: block;
+}
+
+.editor .area {
+    background: #fff;
+    z-index: -1;
+}
+
+.editor .area, .editor .area-scroll {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    height: auto !important;
+}
+
+div.area {
+    height: 100%;
+    background: #fff;
+    color: #222;
+    padding: 0px;
+    margin: 0px;
+    font: 12px/18px DroidSansMono, monospace;
+}
+
+textarea.code, code, pre, div.area {
+    font-family: DroidSansMono, monospace;
+}
+
+.area {
+    line-height: 1em;
+    font-family: monospace;
+    position: relative;
+    overflow: hidden;
+}
+
+.area a {
+    position: relative;
+    text-align:center;
+    top: 100px;
+    display: block;
+}
+
+.editor .area.active {
+    z-index: 0;
+}
+
+.sbtn span, .sbtn span {
+    overflow: hidden;
+    float: left;
+    width: 16px;
+    height: 16px;
+    margin: 4px;
+    background-image: url(../img/icons.png);
+}
+
+.right_move span {
+    background-position: -32px -48px;
+}
+
+.left_move span {
+    background-position: -96px -48px;
+}
