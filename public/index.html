@@ -14,6 +14,7 @@
     <ul>
         <li class="root" id="project">
             <img src="img/project.png"><span id="root_path"></span>
+
             <div id="files">
                 <ul>
                     <li><img src="img/ajax-loader.gif">Loading...
@@ -22,7 +23,7 @@
     </ul>
     <ul>
         <li class="root" id="search">
-        <img src="img/search.png">Results
+            <img src="img/search.png">Results
             <div id="search-results"></div>
     </ul>
 </div>
@@ -41,10 +42,13 @@
                         <span class="icon reverse plus">Add a tab</span>
                     </a>-->
                     <a class="sbtn left_move" href="#" style="display:none;width: 26px; height: 26px;"><span></span></a>
+
                     <div class="tabs-box">
                         <ul id='name-tabs' class="tabs"></ul>
                     </div>
-                    <a class="sbtn right_move" href="#" style="display:none;width: 26px; height: 26px;"><span></span></a>
+                    <a class="sbtn right_move" href="#"
+                       style="display:none;width: 26px; height: 26px;"><span></span></a>
+
                     <div id="code-tabs" class="code fill-s"></div>
                 </div>
             </div>
@@ -71,49 +75,6 @@
 
 <script type="text/javascript">
 
-    $('#files ul .folder').contextmenu({
-        items : [{
-            text :'重命名',
-            icon :'css/skins/default/icons/copy.png',
-            action: function(target){
-                target.innerHTML = "复制中......";
-            }
-        },{
-            text :'新建文件夹',
-            icon :'css/skins/default/icons/table.png',
-            action: function(target){
-                target.innerHTML = "创建中......";
-            }
-        },{
-            text :'新建文件',
-            icon :'css/skins/default/icons/save.png',
-            action: function(target){
-                target.innerHTML = "保存中......";
-            }
-        },{
-            text :'删除',
-            icon :'css/skins/default/icons/pinion.png',
-            action: function(target){
-                target.innerHTML = "设置中......";
-            }
-        }]
-    });
-
-    $('#files ul .file').contextmenu({
-        items : [{
-            text :'重命名',
-            icon :'css/skins/default/icons/copy.png',
-            action: function(target){
-                target.innerHTML = "复制中......";
-            }
-        },{
-            text :'删除',
-            icon :'css/skins/default/icons/table.png',
-            action: function(target){
-                target.innerHTML = "创建中......";
-            }
-        }]
-    });
 </script>
 
 

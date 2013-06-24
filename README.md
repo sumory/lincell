@@ -4,12 +4,13 @@
 
 ## 介绍
 
-LinCell是用 **Node.js** 开发的轻型文件编辑器(也可以作为简单的IDE使用). 它有以下特性：
+LinCell是用 **Node.js** 开发的轻型文件编辑器(也可以作为简单的IDE使用). 它有以下特性(包括change log)：
 
-* 可遍历并展示目录下所有文件夹和文件
+* 目录树添加右键操作支持
+* 多tab页显示文件
 * 对文件夹或文件的CRUD操作
-* 基于ACE Editor，支持各种类型文件的预览和编辑, 如图片预览、代码高亮、markdown语法支持等
-* 文件编辑过程中自动保存
+* 基于ACE Editor，支持各种文件的预览和编辑(修复输入中文时的Bug)
+* 移除自动保存，使用Ctrl + S 手动保存文件更改、可自定义快捷键(基于Kibo)
 * 文件夹、文件查询(按名称)
 
 ![lincell](https://raw.github.com/sumory/lincell/master/examples/lincell.png)
