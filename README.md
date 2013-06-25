@@ -1,4 +1,5 @@
-# LinCell
+# LinCell 
+[![Build Status](https://travis-ci.org/sumory/lincell.png?branch=master)](https://travis-ci.org/sumory/lincell)
 
 **LinCell** [List all in Cell] 是一个编辑器, 只需执行一条命令即可将文件夹变成一个工作空间.
 
