@@ -3,7 +3,6 @@
 var program = require('commander');
 var server = require('./lib/server.js');
 var project = require('./lib/project.js');
-var exec = require('child_process').exec;
 var fs = require('fs');
 var path = require('path');
 var config = require('./config.js');

@@ -717,7 +717,7 @@ $('#files ul .folder').contextmenu({
             }
         },
         {
-            text:'删除',
+            text:'删除文件夹',
             action:function (target) {
                 var oldpath = target.getAttribute("data-path");
                 var dialog = art.dialog({

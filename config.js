@@ -4,6 +4,6 @@
  * Time: 下午11:28
  */
 module.exports = {
-    'version': '0.1.1',
+    'version': '0.1.2',
     'author': 'sumory.wu'
 };
