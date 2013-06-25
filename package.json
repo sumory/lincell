@@ -1,6 +1,6 @@
 {
     "name": "lincell",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "lincell is an editor based on Node.js, you can build a workspace with 'lincell'. ",
     "repository": "https://github.com/sumory/lincell.git",
     "engines": {
