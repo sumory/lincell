@@ -43,6 +43,22 @@ $ npm install -g lincell
       lincell -p 8843 -d ../path       # relative path is also supported
 
 
+## Contributors
+
+    $ git summary
+
+     project  : lincell
+     repo age : 7 weeks
+     active   : 9 days
+     commits  : 20
+     files    : 210
+     authors  :
+        16  sumory                  80.0%
+         2  午夜                    10.0%
+         1  Zongmin Lei             5.0%
+         1  william                 5.0%
+
+
 ## License
 
 LinCell is released under a **MIT License**:

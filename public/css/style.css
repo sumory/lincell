@@ -399,7 +399,7 @@ h1, h2, h3, h4, h5, h6 {
 /* scroller bar - start */
 ::-webkit-scrollbar {
     height: 9px;
-    width: 6px;
+    width: 12px;
 }
 
 ::-webkit-scrollbar-button:start:decrement, ::-webkit-scrollbar-button:end:increment {
