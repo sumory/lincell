@@ -17,7 +17,8 @@
         "express": "3.2.0",
         "commander": "1.1.1",
         "socket.io": "0.9.14",
-        "rimraf": "2.0.3"
+        "rimraf": "2.0.3",
+        "rd": "~0.0.1"
     },
     "devDependencies": {
         "should": "*",
