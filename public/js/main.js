@@ -1,3 +1,9 @@
+var aceConfig = {
+    tabSize: 4,
+    fontSize: '14px',
+    showPrintMargin: false
+};
+
 var ServerConnection = window.ServerConnection = function () {
     var socket = io.connect(window.location.origin, {'connect timeout':20000});
     var saveFileCallbacks = {};
@@ -242,7 +248,6 @@ var addHTMLElementForFileEntry = function (entry, parentElement, fileEntriesArra
     parentElement.appendChild(thisElement);
 };
 
-
 var updateFileListing = function (files) {
     searchResultHtmlElementByPath = {};
     htmlElementByPathTable = {};
@@ -387,14 +392,15 @@ var newFileEditor = function (entry, index) {
             aceEditor.focus();
             aceEditor.setValue(file);
             aceEditor.getSession().setMode("ace/mode/" + mode);
-            aceEditor.setFontSize('14px');
             aceEditor.clearSelection();
-            aceEditor.getSession().setTabSize(4);
+            aceEditor.setFontSize(aceConfig.fontSize);
+            aceEditor.getSession().setTabSize(aceConfig.tabSize);
+            aceEditor.setShowPrintMargin(aceConfig.showPrintMargin);
             aceEditor.on('change', function () {
                 aceEditors[index].changed = true;//标记已修改
                 $("#name-tabs li[name-tab-index=" + index + "] .tab").text("*" + entry.name);
             });
-            aceEditor.setShowPrintMargin(false);
+
 
             showTab(index);
         }
@@ -849,4 +855,41 @@ $('#project-refresh').click(function (e) {
 
 $('#show-hidden').click(function () {
     $('#sidebar').toggleClass('show-hidden');
+});
+
+$('#settings').click(function () {
+    var reg = /^[0-9]*$/;
+    if(art.dialog.get('settings-dialog'))   art.dialog.get('settings-dialog').close();
+    var dialog = art.dialog({
+        id:"settings-dialog",
+        content:"<p style='width:300px;'>编辑器设置:<b style='display:none' id='settingsTip'>&nbsp;请输入数字</b></p>" +
+            "<br/> Tab  Size:<input type='text' width='200px;' name='aceTabSize' value='"+aceConfig.tabSize+"'/>个空格" ,
+        button:[
+            {
+                value:'保存',
+                callback:function () {
+                    $("#settingsTip").hide();
+                    var aceTabSize = $('input[name=aceTabSize]').val();
+
+                    if (reg.test(aceTabSize)) {
+                        aceConfig.tabSize = aceTabSize;
+                        for(var i in aceEditors){
+                            aceEditors[i].editor.getSession().setTabSize(aceConfig.tabSize);
+                        }
+                    }
+                    else{
+                        $("#settingsTip").show();
+                        return false;
+                    }
+                },
+                focus:true
+            },
+            {
+                value:'取消',
+                callback:function () {
+                    dialog.close();
+                }
+            }
+        ]
+    });
 });

@@ -297,6 +297,11 @@ h1, h2, h3, h4, h5, h6 {
 .popup-menu li {
 	padding: 2px 15px 2px 20px;
 	list-style: none;
+    display:block;
+}
+
+.popup-menu li span{
+    display:block;
 }
 
 .popup-menu li.checkbox {
