@@ -11,19 +11,24 @@ var ServerConnection = window.ServerConnection = function () {
 
     socket.on('cwd', function (path) {
         cwd = path;
+        $('#root_path').attr('data-type','directory');
         try {
             if (cwd.indexOf('\\') != -1) {
                 $('#root_path').text(cwd.substring(cwd.lastIndexOf('\\') + 1, cwd.length));
+                $('#root_path').attr('data-path','');
             }
             else if (cwd.indexOf('/') != -1) {
                 $('#root_path').text(cwd.substring(cwd.lastIndexOf('/') + 1, cwd.length));
+                $('#root_path').attr('data-path','');
             }
             else {
                 $('#root_path').text(cwd);
+                $('#root_path').attr('data-path','');
             }
         }
         catch (e) {
             $('#root_path').text('Root path');
+            $('#root_path').attr('data-path','');
         }
     });
 
@@ -636,6 +641,89 @@ function saveFile(index, callback) {
 }
 
 //~====================================左侧目录树右键操作==================================
+$('#root_path').contextmenu({
+    items:[
+        {
+            text:'新建文件夹',
+            action:function (target) {
+                var path = target.getAttribute("data-path");
+                var dialog = art.dialog({
+                    content:"<p>在根目录下新建子文件夹:</p><input type='text' width='200px;' name='newFolderName'/>",
+                    button:[
+                        {
+                            value:'确定',
+                            callback:function () {
+                                var newFolderName = $('input[name=newFolderName]').val();
+                                if (newFolderName)
+                                    connection.addFolder(path, newFolderName);
+                                dialog.close();
+                            },
+                            focus:true
+                        },
+                        {
+                            value:'取消',
+                            callback:function () {
+                                dialog.close();
+                            }
+                        }
+                    ]
+                });
+            }
+        },
+        {
+            text:'新建文件',
+            action:function (target) {
+                var path = target.getAttribute("data-path");
+                var dialog = art.dialog({
+                    content:"<p>在根目录下新建文件:</p><input type='text' width='200px;' name='newFileName'/>",
+                    button:[
+                        {
+                            value:'确定',
+                            callback:function () {
+                                var newFileName = $('input[name=newFileName]').val();
+                                if (newFileName)
+                                    connection.addFile(path, newFileName);
+                                dialog.close();
+                            },
+                            focus:true
+                        },
+                        {
+                            value:'取消',
+                            callback:function () {
+                                dialog.close();
+                            }
+                        }
+                    ]
+                });
+            }
+        },
+        {
+            text:'删除文件夹',
+            action:function (target) {
+                var oldpath = target.getAttribute("data-path");
+                var dialog = art.dialog({
+                    content:"<p>确定要删除文件夹[" + oldpath + "]吗?</p>",
+                    button:[
+                        {
+                            value:'确定',
+                            callback:function () {
+                                connection.removeFile(oldpath);
+                                dialog.close();
+                            },
+                            focus:true
+                        },
+                        {
+                            value:'取消',
+                            callback:function () {
+                                dialog.close();
+                            }
+                        }
+                    ]
+                });
+            }
+        }
+    ]
+});
 
 $('#files ul .folder').contextmenu({
     items:[
