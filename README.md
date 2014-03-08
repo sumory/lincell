@@ -65,7 +65,7 @@ $ npm install -g lincell
 
 LinCell is released under a **MIT License**:
 
-    Copyright (C) 2013 by Sumory Wu <sumory.wu@gmail.com>
+    Copyright (C) 2014 by Sumory Wu <sumory.wu@gmail.com>
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
