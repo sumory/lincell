@@ -1,6 +1,6 @@
 var aceConfig = {
     tabSize: 4,
-    fontSize: '14px',
+    fontSize: '12px',
     showPrintMargin: false
 };
 
@@ -589,8 +589,8 @@ var doSearch = function () {
         $('#project').slideDown();
         $('#search').slideUp();
     }
-}
-$('#search-field').keyup(doSearch).click(doSearch)
+};
+$('#search-field').keyup(doSearch).click(doSearch);
 
 
 //~====================================保存操作==================================
